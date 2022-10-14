@@ -1,0 +1,1 @@
+export const hasWhitespaceChars = (value: string) => !/\s/.test(value);
