@@ -1,8 +1,9 @@
 import { Request, Response } from "express";
 import { UserModel } from '../models/User.model';
 import { RoleModel } from '../models/Role.model';
-import { hash } from 'bcryptjs';
+import { hash, compareSync } from 'bcryptjs';
 import { validationResult } from 'express-validator';
+import { generateAuthToken } from "../lib/authToken";
 
 const PASSWORD_SALT = 7;
 
@@ -13,6 +14,17 @@ interface ISignUpRequestBody {
 
 interface ISignUpResponseBody {
   message: string;
+  errors?: any;
+}
+
+interface ILoginRequestBody {
+  username: string;
+  password: string;
+}
+
+interface ILoginResponseBody {
+  message: string;
+  token?: string; 
   errors?: any;
 }
 
@@ -60,9 +72,34 @@ class AuthController {
     }
   }
 
-  async login(req: Request, res: Response) {
+  async login(
+    req: Request<any, any, ILoginRequestBody>,
+    res: Response<ILoginResponseBody>
+  ) {
       try {
-        console.log('login');
+        const { username, password } = req.body;
+        const findedUser = await UserModel.findOne({ username });
+
+        if (!findedUser) {
+          return res
+            .status(400)
+            .json({message: `There are no users with username: ${username}`})
+        }
+
+        const isPasswordCorrect = compareSync(password, findedUser.password);
+        
+        if (!isPasswordCorrect) {
+          return res
+            .status(400)
+            .json({message: 'Password is incorrect'});
+        }
+
+        const token = generateAuthToken(String(findedUser._id), findedUser.roles);
+
+        return res
+          .status(200)
+          .json({message: 'Success login', token: token});
+
       } catch (err) {
         console.warn(err);
         res.status(400).json({ message: 'Login error'});
