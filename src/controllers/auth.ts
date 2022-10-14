@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { UserModel } from '../models/User.model';
 import { RoleModel } from '../models/Role.model';
 import { hash } from 'bcryptjs';
+import { validationResult } from 'express-validator';
 
 const PASSWORD_SALT = 7;
 
@@ -12,14 +13,22 @@ interface ISignUpRequestBody {
 
 interface ISignUpResponseBody {
   message: string;
+  errors?: any;
 }
 
 class AuthController {
   async signUp(
-    req: Request<null, null, ISignUpRequestBody>,
+    req: Request<any, any, ISignUpRequestBody>,
     res: Response<ISignUpResponseBody>
   ) {
     try {
+      const validationErrors = validationResult(req);
+      if (!validationErrors.isEmpty()) {
+        return res
+          .status(400)
+          .json({message: 'Validation error', errors: validationErrors})
+      }
+
       const { username, password } = req.body;
       const alreadyRegistredUser = await UserModel.findOne({ username });
 
