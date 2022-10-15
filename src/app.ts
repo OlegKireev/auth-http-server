@@ -12,7 +12,7 @@ const app = express();
 
 const startServer = () => {
     try {
-    db.connect(DB_HOST || '');    
+    db.connect(DB_HOST);    
     
     app.use(json());
     app.use('/auth' ,authRouter);
