@@ -1,8 +1,8 @@
-import mongoose from 'mongoose';
+import { connect, connection } from 'mongoose';
 
 export const db = {
   connect: async (uri: string) => {
-    await mongoose.connect(uri, (err) => {
+    await connect(uri, (err) => {
       if (err) {
         console.warn(err);
       } else {
@@ -10,7 +10,7 @@ export const db = {
       }
     });
 
-    mongoose.connection.on('error', (err) => {
+    connection.on('error', (err) => {
       console.warn(err);
       console.log(
         '[db]: MongoDB connection error. Please make sure MongoDB is running.'
@@ -21,6 +21,6 @@ export const db = {
   },
   close: () => {
     // Метод отключения от БД
-    mongoose.connection.close();
+    connection.close();
   }
 }
