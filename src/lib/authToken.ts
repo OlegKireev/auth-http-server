@@ -1,11 +1,14 @@
 import { sign } from 'jsonwebtoken';
+import { Role } from '../types/roles';
+
+export type TokenData = {
+  id: string,
+  roles: Role[]
+};
 
 type GenerateAuthToken = (
   id: string,
-  roles: {
-    type?: string | undefined;
-    ref?: unknown;
-  }[]
+  roles: Role[]
 ) => string
 
 export const generateAuthToken: GenerateAuthToken = (
@@ -13,8 +16,9 @@ export const generateAuthToken: GenerateAuthToken = (
   roles
 ) => {
   const secretKey = process.env.SECRET_KEY;
-  const payload = { id, roles };
+  const payload: TokenData = { id, roles };
+  
   return sign(payload, secretKey, {
-    expiresIn: '1m'
+    expiresIn: '30d'
   });
 };
