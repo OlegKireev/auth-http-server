@@ -1,7 +1,6 @@
 import { Router } from 'express';
 import { 
   authController,
-  userController
 } from '../controllers';
 import { check } from 'express-validator';
 import { hasWhitespaceChars } from '../lib/validators';
@@ -26,4 +25,3 @@ authRouter.post('/signup',
 );
 
 authRouter.post('/login', authController.login);
-authRouter.get('/users', userController.getUsers);
