@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { UserModel } from "../../models/User.model";
 import { compareSync } from 'bcryptjs';
 import { generateAuthToken } from "../../lib/authToken";
+import { Role } from "../../types/roles";
 
 interface ILoginRequestBody {
   username: string;
@@ -36,7 +37,11 @@ export const login = async (
           .json({message: 'Password is incorrect'});
       }
 
-      const token = generateAuthToken(String(findedUser._id), findedUser.roles);
+      const userRoles = findedUser.roles as Role[];
+
+      console.log(findedUser);
+
+      const token = generateAuthToken(String(findedUser._id), userRoles);
 
       return res
         .status(200)
